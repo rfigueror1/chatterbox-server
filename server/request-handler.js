@@ -53,6 +53,12 @@ var requestHandler = function(request, response) {
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
   if (request.method === 'GET') {
+    console.log(request.url, typeof request.url);
+    if (request.url !== '/classes/messages') {
+      statusCode = 404;
+      response.writeHead(statusCode, headers);
+      response.end();
+    }
     response.writeHead(statusCode, headers);  
     response.end(JSON.stringify(responsebody));
   } else if (request.method === 'POST') {
@@ -73,10 +79,6 @@ var requestHandler = function(request, response) {
     response.end();
   }
 
-    
-
-
-  
 
 
   // Make sure to always call response.end() - Node may not send
