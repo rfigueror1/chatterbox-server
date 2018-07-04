@@ -20,8 +20,7 @@ var defaultCorsHeaders = {
 var responsebody = {results: []};
 
 var requestHandler = function(request, response) {
-  const { parse } = require('querystring');
-  var obj = {results: []};
+
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -52,12 +51,14 @@ var requestHandler = function(request, response) {
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
-  if (request.method === 'GET') {
-    console.log(request.url, typeof request.url);
-    if (request.url !== '/classes/messages') {
+  if (request.method === 'OPTIONS') {
+    response.writeHead(statusCode, headers);
+    response.end('options ended');
+  } else if (request.method === 'GET') {
+    if (!request.url.includes('/classes/messages')) {
       statusCode = 404;
       response.writeHead(statusCode, headers);
-      response.end();
+      response.end('invalid url');
     }
     response.writeHead(statusCode, headers);  
     response.end(JSON.stringify(responsebody));
@@ -69,8 +70,10 @@ var requestHandler = function(request, response) {
       body += data.toString();
     }).on('end', function() {
       body = JSON.parse(body);
+
+      body.objectId = responsebody.results.length + 1;
       responsebody.results.push(body);
-      console.log(JSON.stringify(responsebody));
+      
       response.end(JSON.stringify(responsebody));
     });
   } else {
